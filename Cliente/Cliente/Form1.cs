@@ -54,7 +54,7 @@ namespace Cliente
                 socket.Receive(data);
                 string[] mensaje = Encoding.ASCII.GetString(data).Split('\0');
                 string [] trozoMensaje=mensaje[0].Split('/');
-                int IDmensaje = Convert.ToInt32(trozoMensaje[0]);
+               int IDmensaje = Convert.ToInt32(trozoMensaje[0]);
 
                 switch (IDmensaje)
                 {
@@ -99,6 +99,9 @@ namespace Cliente
                         }
                         dataGridView_listaConectados.ColumnHeadersVisible = false;
                         break;
+                    default:
+                        MessageBox.Show("Mensaje recibido erróneo.");
+                        break;
                         
 
                 }
@@ -128,7 +131,7 @@ namespace Cliente
         private void Conexion()
         {
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            remoteEP = new IPEndPoint(IPAddress.Parse("192.168.1.48"), 9150);
+            remoteEP = new IPEndPoint(IPAddress.Parse("192.168.1.48"), 9230);
             try
             {
                 socket.Connect(remoteEP);
