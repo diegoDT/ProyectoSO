@@ -50,11 +50,11 @@ namespace Cliente
             while (true)
             {
                 //Recibimos mensaje del servidor
-                byte[] data = new byte[1024];
+                byte[] data = new byte[80];
                 socket.Receive(data);
                 string[] mensaje = Encoding.ASCII.GetString(data).Split('\0');
                 string [] trozoMensaje=mensaje[0].Split('/');
-               int IDmensaje = Convert.ToInt32(trozoMensaje[0]);
+                int IDmensaje = Convert.ToInt32(trozoMensaje[0]);
 
                 switch (IDmensaje)
                 {
@@ -89,6 +89,7 @@ namespace Cliente
                         break;
                     case 6: //Notificación de cambio en lista de conectados
 
+                        /*
                         panel_listaConectados.Visible = true;
 
                         dataGridView_listaConectados.RowCount = Convert.ToInt32(trozoMensaje[1]);
@@ -97,7 +98,15 @@ namespace Cliente
                         {
                             dataGridView_listaConectados[0, i].Value = trozoMensaje[i + 2];
                         }
-                        dataGridView_listaConectados.ColumnHeadersVisible = false;
+                        dataGridView_listaConectados.ColumnHeadersVisible = false;*/
+
+                        
+                        for(int i = 0; i < Convert.ToInt32(trozoMensaje[1]); i++)
+                        {
+                            int conectado = i + 1;
+                            MessageBox.Show("Conectado " + conectado + ": " + trozoMensaje[i + 2]);
+                        }
+
                         break;
                     default:
                         MessageBox.Show("Mensaje recibido erróneo.");
@@ -131,7 +140,7 @@ namespace Cliente
         private void Conexion()
         {
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            remoteEP = new IPEndPoint(IPAddress.Parse("192.168.1.48"), 9230);
+            remoteEP = new IPEndPoint(IPAddress.Parse("192.168.1.48"), 9240);
             try
             {
                 socket.Connect(remoteEP);

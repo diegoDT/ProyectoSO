@@ -340,8 +340,8 @@ void Notificacion_ListaConectados(int s, Tlistaconectados *lista){
 	
 	if(lista->numeroconectados>0){
 		for(int j=0;j<lista->numeroconectados;j++){
-			if(lista->conectados[j].socket!=s)
-				write(lista->conectados[j].socket,notificacion,strlen(notificacion));
+			//if(lista->conectados[j].socket!=s)
+			write(lista->conectados[j].socket,notificacion,strlen(notificacion));
 	}
 	}
 }
@@ -392,15 +392,30 @@ void *Atender_Cliente(void *socket){
 					else{
 						printf("Error al añadir un jugador a la lista de conectados");
 					}
+					Notificacion_ListaConectados(sock_conn, &lista);
 				}
 				else if (resultado==-1){
 					sprintf(respuesta,"0/%d\0",resultado);
 					terminar=1;
-					
+					write(sock_conn,respuesta,strlen(respuesta));
+					printf("%s\n", respuesta);
 				}
-				write(sock_conn,respuesta,strlen(respuesta));
-				printf("%s\n", respuesta);
-				Notificacion_ListaConectados(sock_conn, &lista);
+				//Desactivamos el algoritmo de Nagle.
+				//int flag = 1;
+				//int result = setsockopt(sock_conn,IPPROTO_TCP,TCP_NODELAY,(char *) &flag,sizeof(int));
+				//if(result==-1)
+					//printf("Error al desactivar el algoritmo de Nagle.\n");
+				//write(sock_conn, respuesta, strlen(respuesta));
+				//printf("%s\n", respuesta);
+				//Volvemos a activar el algoritmo de Nagle.
+				//flag=0;
+				//int result = setsockopt(sock_conn,IPPROTO_TCP,TCP_NODELAY,(char *) &flag,sizeof(int));
+				//if(result==-1)
+					//printf("Error al activar el algoritmo de Nagle.\n");
+				//Notificacion_ListaConectados(sock_conn, &lista);
+				
+				
+				
 				
 				break;
 			//Consulta Cristian
@@ -512,13 +527,12 @@ int main(int argc, char *argv[])
 	memset(&serv_adr, 0, sizeof(serv_adr));// inicializa a cero serv_addr
 	serv_adr.sin_family = AF_INET;
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY); /* Lo mete en IP local */
-	serv_adr.sin_port = htons(9230);
+	serv_adr.sin_port = htons(9240);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf("Error en el bind\n");
 	// Limitamos el numero de conexiones pendientes
 	if (listen(sock_listen, 10) < 0)
 		printf("Error en el listen\n");
-		printf("Error al desactivar el algoritmo de Nagle.\n");
 	for(i=0;;i++){
 		printf("Escuchando\n");
 		//sock_conn es el socket que utilizaremos para el cliente
@@ -528,6 +542,7 @@ int main(int argc, char *argv[])
 		int flag = 1;
 		int result = setsockopt(sock_conn,IPPROTO_TCP,TCP_NODELAY,(char *) &flag,sizeof(int));
 		if(result==-1)
+			printf("Error al desactivar el algoritmo de Nagle.\n");
 		//Almacenamos en el vector de sockets , el socket con el que nos comunicaremos con el usuario recien conectado
 		sockets[i] = sock_conn;
 		//Crear thread y decirle lo que tiene que hacer
